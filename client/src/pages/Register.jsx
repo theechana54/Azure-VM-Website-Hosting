@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import AuthBackground from "../components/AuthBackground";
 
 const Register = () => {
-  const [form, setForm] = useState({ name: "", email: "", password: "", role: "user" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -15,9 +15,15 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
     try {
-      await register(form.name, form.email, form.password, form.role);
+      await register(form.name, form.email, form.password, "user");
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
@@ -78,16 +84,16 @@ const Register = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 text-white/90">Role</label>
-            <select
-              name="role"
-              value={form.role}
+            <label className="block text-sm font-medium mb-1 text-white/90">Confirm Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              required
+              minLength={6}
+              value={form.confirmPassword}
               onChange={handleChange}
-              className="w-full bg-white/20 border border-white/30 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/60"
-            >
-              <option value="user" className="text-black">User</option>
-              <option value="admin" className="text-black">Admin</option>
-            </select>
+              className="w-full bg-white/20 border border-white/30 rounded-md px-3 py-2 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/60"
+            />
           </div>
           <button
             type="submit"
